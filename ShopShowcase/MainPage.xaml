@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ShopShowcase.MainPage"
+             xmlns:models="clr-namespace:ShopShowcase.Models"
+             xmlns:vm="clr-namespace:ShopShowcase.ViewModel"
+             x:DataType="vm:ProductsViewModel">
+    <CollectionView x:Name="ProductsCollectionView"
+                SelectionMode="Single"
+                SelectionChanged="ProductsCollectionView_SelectionChanged"
+                ItemsSource="{Binding Products}"
+                Margin="10"
+                SizeChanged="ProductsCollectionView_SizeChanged">
+
+   <CollectionView.ItemTemplate>
+    <DataTemplate x:DataType="models:Product">
+        <Border
+            Stroke="LightGray"
+            StrokeThickness="1"
+            BackgroundColor="White"
+            Padding="10"
+            Margin="5">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="8">
+                <!-- Rounded Image -->
+                <Border Padding="0" StrokeThickness="0" BackgroundColor="Transparent">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="6" />
+                    </Border.StrokeShape>
+                    <Image Source="{Binding ImageUrl}"
+                           HeightRequest="150"
+                           Aspect="AspectFill" />
+                </Border>
+                
+                <Label Text="{Binding Title}"
+                       FontAttributes="Bold"
+                       FontSize="16" />
+                
+                <Label Text="{Binding Description}"
+                       FontSize="13"
+                       TextColor="Gray"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="2"/>
+                
+                <Label Text="{Binding Price, StringFormat='{0:C}'}"
+                       FontSize="14"
+                       TextColor="Green"
+                       FontAttributes="Bold" />
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+</CollectionView.ItemTemplate>
+</CollectionView>
+
+</ContentPage>

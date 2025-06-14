@@ -1,0 +1,63 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ShopShowcase.ProductDetailsPage"
+             xmlns:models="clr-namespace:ShopShowcase.Models"
+             xmlns:vm="clr-namespace:ShopShowcase.ViewModel"
+             x:DataType="vm:ProductDetailsViewModel"
+             Title="{Binding Product.Title}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <!-- Product Image -->
+            <Image Source="{Binding Product.ImageUrl}" HeightRequest="300" Aspect="AspectFill" />
+
+            <!-- Title -->
+            <Label Text="{Binding Product.Title}" FontAttributes="Bold" FontSize="24" />
+
+            <!-- Description -->
+            <Label Text="{Binding Product.Description}" FontSize="14" TextColor="Gray" />
+
+            <!-- Option Pickers -->
+            <CollectionView ItemsSource="{Binding Options}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:OptionViewModel">
+                        <VerticalStackLayout Padding="0,8,0,0">
+                            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
+                            <Picker ItemsSource="{Binding Values}"
+                                    SelectedItem="{Binding SelectedValue, Mode=TwoWay}" />
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Quantity -->
+            <Label Text="Quantity" FontAttributes="Bold" />
+            <Grid ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center">
+                <Button Text="−" Clicked="OnDecreaseQuantity" Grid.Column="0" />
+                <Label Text="{Binding Quantity}" 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center"
+                       FontSize="16" 
+                       Grid.Column="1" />
+                <Button Text="+" Clicked="OnIncreaseQuantity" Grid.Column="2" />
+            </Grid>
+
+            <!-- Selected Variant Price -->
+            <Label Text="{Binding SelectedVariant.Price, StringFormat='Price: {0:C}'}"
+                   FontSize="18"
+                   TextColor="Green"
+                   IsVisible="{Binding SelectedVariant}" />
+
+            <!-- Add to Cart -->
+            <Button Text="Add to Cart"
+                    BackgroundColor="#007AFF"
+                    TextColor="White"
+                    CornerRadius="8"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    Command="{Binding AddToCartCommand}"
+                    IsEnabled="{Binding SelectedVariant.Available}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

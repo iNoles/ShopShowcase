@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:model="clr-namespace:ShopShowcase.Models"
+    xmlns:vm="clr-namespace:ShopShowcase.ViewModel"
+    x:DataType="vm:CartViewModel"
+    Title="Your Cart">
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+
+        <!-- Empty Cart Message -->
+        <Label Text="Your cart is empty."
+               FontSize="18"
+               TextColor="Gray"
+               HorizontalOptions="Center"
+               IsVisible="{Binding HasItems, Converter={StaticResource InverseBoolConverter}}" />
+
+        <!-- Cart Items -->
+        <CollectionView ItemsSource="{Binding Items}" IsVisible="{Binding HasItems}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:CartItem">
+                    <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="White" StrokeShape="RoundRectangle 8">
+                        <HorizontalStackLayout Spacing="10">
+                            <Image Source="{Binding Product.ImageUrl}" WidthRequest="60" HeightRequest="60"/>
+                            <VerticalStackLayout>
+                                <Label Text="{Binding DisplayTitle}" FontAttributes="Bold"/>
+                                <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}"/>
+                                <Label Text="{Binding UnitPrice, StringFormat='Unit: {0:C}'}"/>
+                                <Label Text="{Binding TotalPrice, StringFormat='Total: {0:C}'}"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Total Row -->
+        <HorizontalStackLayout IsVisible="{Binding HasItems}" HorizontalOptions="End" Spacing="10" Margin="0,10,0,0">
+            <Label Text="Total:" FontSize="18" FontAttributes="Bold" />
+            <Label Text="{Binding Total, StringFormat='{0:C}'}" FontSize="18" />
+        </HorizontalStackLayout>
+
+        <Button Text="Checkout" Margin="0,20,0,0" Command="{Binding CheckoutCommand}" IsEnabled="{Binding HasItems}" />
+    </VerticalStackLayout>
+</ContentPage>
