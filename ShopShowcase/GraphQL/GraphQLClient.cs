@@ -8,11 +8,14 @@ public class GraphQLClient
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
+    private readonly string _baseUrl;
 
-    public GraphQLClient(HttpClient httpClient)
+    public GraphQLClient(HttpClient httpClient, string baseUrl)
     {
         _httpClient = httpClient;
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        
+        _baseUrl = baseUrl;
 
         _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
     }
@@ -27,7 +30,7 @@ public class GraphQLClient
 
         var content = new StringContent(JsonSerializer.Serialize(requestBody, _jsonOptions), Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync("", content);
+        var response = await _httpClient.PostAsync(_baseUrl, content);
         response.EnsureSuccessStatusCode();
 
         using var stream = await response.Content.ReadAsStreamAsync();
