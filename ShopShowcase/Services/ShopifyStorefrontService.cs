@@ -10,15 +10,11 @@ public class ShopifyStorefrontService : IProductService
 
   public ShopifyStorefrontService()
   {
-    var httpClient = new HttpClient
-    {
-      BaseAddress = new Uri(AppConfig.ShopifyUrl)
-    };
-
+    var httpClient = new HttpClient();
     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     httpClient.DefaultRequestHeaders.Add("X-Shopify-Storefront-Access-Token", AppConfig.ShopifyToken);
 
-    _graphqlClient = new GraphQLClient(httpClient);
+    _graphqlClient = new GraphQLClient(httpClient, AppConfig.ShopifyUrl);
   }
 
   public async Task<List<Product>> GetProductsAsync()
