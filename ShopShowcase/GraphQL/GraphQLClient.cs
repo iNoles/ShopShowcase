@@ -33,7 +33,7 @@ public class GraphQLClient
         using var stream = await response.Content.ReadAsStreamAsync();
 
         var graphQLResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<T>>(stream, _jsonOptions) ?? throw new Exception("Invalid GraphQL response.");
-        if (graphQLResponse.Errors?.Count == 0)
+        if (graphQLResponse.Errors?.Count > 0)
             throw new Exception("GraphQL errors: " + string.Join(", ", graphQLResponse.Errors.Select(e => e.Message)));
 
         return graphQLResponse.Data!;
