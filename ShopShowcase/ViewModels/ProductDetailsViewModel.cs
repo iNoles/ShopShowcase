@@ -37,8 +37,9 @@ public class ProductDetailsViewModel : BaseViewModel
         Options = new ObservableCollection<OptionViewModel>(
             product.Options.Select(option =>
             {
-                var initial = option.Values.FirstOrDefault() ?? string.Empty;
-                var vm = new OptionViewModel(option.Name, option.Values, initial);
+                var values = option.Values ?? [];
+                var initial = values.FirstOrDefault() ?? string.Empty;
+                var vm = new OptionViewModel(option.Name, values, initial);
                 vm.SelectedChanged += OnOptionSelectedChanged;
                 return vm;
             }));

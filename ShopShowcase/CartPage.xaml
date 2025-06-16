@@ -2,9 +2,11 @@
 <ContentPage 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ShopShowcase.CartPage"
     xmlns:model="clr-namespace:ShopShowcase.Models"
     xmlns:vm="clr-namespace:ShopShowcase.ViewModel"
     x:DataType="vm:CartViewModel"
+
     Title="Your Cart">
 
     <VerticalStackLayout Padding="20" Spacing="10">
