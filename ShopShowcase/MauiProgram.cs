@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using ShopShowcase.Services;
-using ShopShowcase.ViewModel;
+using ShopShowcase.ViewModels;
 
 namespace ShopShowcase;
 
@@ -23,6 +23,16 @@ public static class MauiProgram
 		builder.Services.AddSingleton<CartService>();
 		builder.Services.AddTransient<CartViewModel>();
 		builder.Services.AddTransient<CartPage>();
+
+		// Register ProductService implementation
+		if (AppConfig.UseMockData)
+		{
+			builder.Services.AddSingleton<IProductService, MockProductService>();
+		}
+		else
+		{
+			builder.Services.AddSingleton<IProductService, ShopifyStorefrontService>();
+		}
 
 #if DEBUG
 		builder.Logging.AddDebug();

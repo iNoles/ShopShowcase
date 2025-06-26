@@ -3,7 +3,7 @@ using System.Windows.Input;
 using ShopShowcase.Models;
 using ShopShowcase.Services;
 
-namespace ShopShowcase.ViewModel;
+namespace ShopShowcase.ViewModels;
 
 public class ProductDetailsViewModel : BaseViewModel
 {

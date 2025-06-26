@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using ShopShowcase.Models;
 using ShopShowcase.Services;
 
-namespace ShopShowcase.ViewModel;
+namespace ShopShowcase.ViewModels;
 
 public class ProductsViewModel : ObservableObject
 {
@@ -11,16 +11,13 @@ public class ProductsViewModel : ObservableObject
 
     public ObservableCollection<Product> Products { get; } = [];
 
-    public ProductsViewModel()
+    public ProductsViewModel(IProductService productService)
     {
-        _productService = AppConfig.UseMockData
-            ? new MockProductService()
-            : new ShopifyStorefrontService(); // must implement IProductService
-
-        LoadProducts();
+        _productService = productService;
+        _ = LoadProductsAsync();
     }
 
-    private async void LoadProducts()
+    private async Task LoadProductsAsync()
     {
         var products = await _productService.GetProductsAsync();
         Products.Clear();

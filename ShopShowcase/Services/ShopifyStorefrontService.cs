@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using ShopShowcase.GraphQL;
 using ShopShowcase.Models;
+using ProductVariant = ShopShowcase.Models.ProductVariant;
 
 namespace ShopShowcase.Services;
 
@@ -66,7 +67,7 @@ public class ShopifyStorefrontService : IProductService
     if (result.Products?.Edges == null)
       return [];
 
-    return result.Products.Edges.Select(edge =>
+    return [.. result.Products.Edges.Select(edge =>
     {
       var node = edge.Node;
       return new Product
@@ -87,13 +88,61 @@ public class ShopifyStorefrontService : IProductService
           Price = decimal.TryParse(v.Node.PriceV2.Amount, out var price) ? price : 0,
           SKU = v.Node.Sku,
           Available = v.Node.AvailableForSale,
-          SelectedOptions = v.Node.SelectedOptions.Select(so => new SelectedOption
+          SelectedOptions = [.. v.Node.SelectedOptions.Select(so => new SelectedOption
           {
             Name = so.Name,
             Value = so.Value
-          }).ToList()
+          })]
         }).ToList() ?? []
       };
-    }).ToList();
+    })];
+  }
+
+  public async Task<CheckoutResult?> CreateCheckoutAsync(IEnumerable<CartItem> items)
+  {
+    const string mutation = @"
+      mutation checkoutCreate($lineItems: [CheckoutLineItemInput!]!) {
+        checkoutCreate(input: { lineItems: $lineItems }) {
+          checkout {
+            id
+            webUrl
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }";
+
+    var lineItems = items.Select(i =>
+    {
+      var variantId = i.Variant?.Id ?? i.Product.Variants.FirstOrDefault()?.Id;
+      return new
+      {
+        variantId,
+        quantity = i.Quantity
+      };
+    })
+    .Where(i => !string.IsNullOrEmpty(i.variantId)) // ensure null variant IDs are excluded
+    .ToList();
+
+    if (lineItems.Count == 0)
+      throw new InvalidOperationException("No valid variants found for checkout.");
+
+    var variables = new { lineItems };
+
+    var response = await _graphqlClient.ExecuteAsync<CheckoutCreateResponse>(mutation, variables);
+
+    var userErrors = response.CheckoutCreate?.UserErrors;
+    if (userErrors is { Count: > 0 })
+    {
+      var message = string.Join("; ", userErrors.Select(e => $"{e.Field?.FirstOrDefault() ?? "unknown"}: {e.Message}"));
+      throw new InvalidOperationException($"Checkout failed: {message}");
+    }
+
+    var checkout = response.CheckoutCreate?.Checkout;
+    return checkout != null
+        ? new CheckoutResult { CheckoutId = checkout.Id, WebUrl = checkout.WebUrl }
+        : null;
   }
 }

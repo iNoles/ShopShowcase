@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ShopShowcase.ViewModel;
+namespace ShopShowcase.ViewModels;
 
 public abstract class BaseViewModel : INotifyPropertyChanged
 {

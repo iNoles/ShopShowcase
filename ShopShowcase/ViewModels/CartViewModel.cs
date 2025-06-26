@@ -1,13 +1,15 @@
 using System.Collections.ObjectModel;
-using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using ShopShowcase.Models;
 using ShopShowcase.Services;
 
-namespace ShopShowcase.ViewModel;
+namespace ShopShowcase.ViewModels;
 
 public class CartViewModel : BaseViewModel
 {
     private readonly CartService _cartService;
+
+    private readonly IProductService _productService;
 
     public ReadOnlyObservableCollection<CartItem> Items => _cartService.Items;
 
@@ -15,11 +17,12 @@ public class CartViewModel : BaseViewModel
 
     public decimal Total => Items.Sum(item => item.TotalPrice);
 
-    public ICommand CheckoutCommand { get; }
+    public IAsyncRelayCommand CheckoutCommand { get; }
 
-    public CartViewModel(CartService cartService)
+    public CartViewModel(CartService cartService, IProductService productService)
     {
         _cartService = cartService;
+        _productService = productService;
 
         _cartService.CartChanged += (s, e) =>
         {
@@ -28,12 +31,27 @@ public class CartViewModel : BaseViewModel
             OnPropertyChanged(nameof(Total));
         };
 
-        CheckoutCommand = new Command(OnCheckout);
+        CheckoutCommand = new AsyncRelayCommand(OnCheckoutAsync);
     }
 
-    private void OnCheckout()
+    private async Task OnCheckoutAsync()
     {
-        Shell.Current.DisplayAlert("Checkout", "Proceeding to in-app browser...", "OK");
-        // You can launch your in-app browser logic here
+        if (!Items.Any())
+        {
+            await Shell.Current.DisplayAlert("Cart", "Your cart is empty.", "OK");
+            return;
+        }
+
+        var result = await _productService.CreateCheckoutAsync(_cartService.Items);
+
+        if (result != null)
+        {
+            await Shell.Current.DisplayAlert("Checkout", "Opening browser...", "OK");
+            await Browser.Default.OpenAsync(result.WebUrl, BrowserLaunchMode.SystemPreferred);
+        }
+        else
+        {
+            await Shell.Current.DisplayAlert("Error", "Unable to start checkout.", "OK");
+        }
     }
 }

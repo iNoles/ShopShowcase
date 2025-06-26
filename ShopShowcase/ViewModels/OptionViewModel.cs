@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace ShopShowcase.ViewModel;
+namespace ShopShowcase.ViewModels;
 
 public class OptionViewModel(string name, IEnumerable<string> values, string initial) : BaseViewModel
 {

@@ -111,4 +111,9 @@ public class MockProductService : IProductService
 
         return options;
     }
+
+    public Task<CheckoutResult?> CreateCheckoutAsync(IEnumerable<CartItem> items)
+    {
+        return Task.FromResult<CheckoutResult?>(null);
+    }
 }
