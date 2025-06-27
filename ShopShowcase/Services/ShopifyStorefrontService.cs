@@ -145,4 +145,50 @@ public class ShopifyStorefrontService : IProductService
         ? new CheckoutResult { CheckoutId = checkout.Id, WebUrl = checkout.WebUrl }
         : null;
   }
+
+  public async Task<CheckoutResult?> UpdateCheckoutAsync(string checkoutId, IEnumerable<CartItem> items)
+  {
+    const string mutation = @"
+    mutation checkoutLineItemsUpdate($checkoutId: ID!, $lineItems: [CheckoutLineItemUpdateInput!]!) {
+      checkoutLineItemsUpdate(checkoutId: $checkoutId, lineItems: $lineItems) {
+        checkout {
+          id
+          webUrl
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }";
+
+    var lineItems = items
+        .Where(i => i.Variant != null)
+        .Select(i => new
+        {
+          variantId = i.Variant!.Id,
+          quantity = i.Quantity
+        })
+        .ToList();
+
+    var variables = new
+    {
+      checkoutId,
+      lineItems
+    };
+
+    var response = await _graphqlClient.ExecuteAsync<CheckoutUpdateResponse>(mutation, variables);
+
+    var errors = response.CheckoutLineItemsUpdate?.UserErrors;
+    if (errors is { Count: > 0 })
+    {
+      var message = string.Join("; ", errors.Select(e => $"{e.Field?.FirstOrDefault() ?? "unknown"}: {e.Message}"));
+      throw new InvalidOperationException($"Checkout update failed: {message}");
+    }
+
+    var checkout = response.CheckoutLineItemsUpdate?.Checkout;
+    return checkout != null
+        ? new CheckoutResult { CheckoutId = checkout.Id, WebUrl = checkout.WebUrl }
+        : null;
+  }
 }

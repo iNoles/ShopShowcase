@@ -2,10 +2,15 @@ namespace ShopShowcase.GraphQL;
 
 public class CheckoutCreateResponse
 {
-    public CheckoutCreatePayload? CheckoutCreate { get; set; }
+    public CheckoutPayload? CheckoutCreate { get; set; }
 }
 
-public class CheckoutCreatePayload
+public class CheckoutUpdateResponse
+{
+    public CheckoutPayload? CheckoutLineItemsUpdate { get; set; }
+}
+
+public class CheckoutPayload
 {
     public CheckoutObject? Checkout { get; set; }
     public List<UserError>? UserErrors { get; set; }

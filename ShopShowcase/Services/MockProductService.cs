@@ -116,4 +116,9 @@ public class MockProductService : IProductService
     {
         return Task.FromResult<CheckoutResult?>(null);
     }
+
+    public Task<CheckoutResult?> UpdateCheckoutAsync(string checkoutId, IEnumerable<CartItem> items)
+    {
+        return Task.FromResult<CheckoutResult?>(null);
+    }
 }
